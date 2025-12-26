@@ -45,3 +45,12 @@ async def get_stock_history(symbol: str, db: AsyncSession = Depends(get_db)):
     # Optimally, we should add date range filters here
     result = await db.execute(select(MarketData).where(MarketData.symbol == symbol).order_by(MarketData.date.desc()))
     return result.scalars().all()
+
+@router.get("/health")
+async def health_check(db: AsyncSession = Depends(get_db)):
+    try:
+        from sqlalchemy import text
+        await db.execute(text("SELECT 1"))
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database connection failed: {str(e)}")

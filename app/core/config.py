@@ -5,9 +5,11 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Share Market Data Service"
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "password"
-    POSTGRES_SERVER: str = "localhost"
+    # Vercel standard variable is POSTGRES_HOST
+    POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: str = "5432"
-    POSTGRES_DB: str = "market_data"
+    # Vercel standard variable is POSTGRES_DATABASE
+    POSTGRES_DATABASE: str = "market_data"
     
     # Vercel automatically injects POSTGRES_URL or DATABASE_URL
     POSTGRES_URL: Optional[str] = None
@@ -21,7 +23,7 @@ class Settings(BaseSettings):
         
         if not url:
             # Fallback to constructing from components
-            url = f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            url = f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DATABASE}"
             
         # Ensure asyncpg driver is used
         if url.startswith("postgres://"):
