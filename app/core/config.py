@@ -13,17 +13,28 @@ class Settings(BaseSettings):
     
     # Vercel automatically injects POSTGRES_URL or DATABASE_URL
     POSTGRES_URL: Optional[str] = None
+    POSTGRES_PRISMA_URL: Optional[str] = None
+    POSTGRES_URL_NON_POOLING: Optional[str] = None
+    
     # Allow overriding DATABASE_URL directly
     DATABASE_URL_ENV: Optional[str] = None 
     
     @property
     def DATABASE_URL(self) -> str:
-        # Check for direct URL (Vercel or manual)
-        url = self.DATABASE_URL_ENV or self.POSTGRES_URL
+        # Prioritize Vercel/System Env Vars
+        url = (
+            self.DATABASE_URL_ENV or 
+            self.POSTGRES_URL or 
+            self.POSTGRES_PRISMA_URL or 
+            self.POSTGRES_URL_NON_POOLING
+        )
         
         if not url:
             # Fallback to constructing from components
+            print("WARNING: No Vercel/Env DB URL found. Defaulting to constructed URL (likely localhost).")
             url = f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DATABASE}"
+        else:
+             print("INFO: Found Database URL from environment variables.")
             
         # Ensure asyncpg driver is used
         if url.startswith("postgres://"):
