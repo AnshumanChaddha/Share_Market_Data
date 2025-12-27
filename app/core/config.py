@@ -43,6 +43,12 @@ class Settings(BaseSettings):
         elif url.startswith("postgresql://") and "asyncpg" not in url:
              url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
              
+        # asyncpg does not support 'sslmode' in query params, it handles SSL natively
+        # Neon/Vercel URLs often include ?sslmode=require which breaks asyncpg
+        if "sslmode=" in url:
+            # Simple string replacement for the most common case
+            url = url.replace("?sslmode=require", "").replace("&sslmode=require", "")
+             
         return url
 
     class Config:
