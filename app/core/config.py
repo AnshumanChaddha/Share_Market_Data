@@ -1,23 +1,24 @@
+import os
 from pydantic_settings import BaseSettings
 from typing import Optional
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Share Market Data Service"
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "password"
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "postgres")
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "password")
     # Vercel standard variable is POSTGRES_HOST
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: str = "5432"
+    POSTGRES_HOST: str = os.getenv("POSTGRES_HOST", "localhost")
+    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
     # Vercel standard variable is POSTGRES_DATABASE
-    POSTGRES_DATABASE: str = "market_data"
+    POSTGRES_DATABASE: str = os.getenv("POSTGRES_DATABASE", "market_data")
     
     # Vercel automatically injects POSTGRES_URL or DATABASE_URL
-    POSTGRES_URL: Optional[str] = None
-    POSTGRES_PRISMA_URL: Optional[str] = None
-    POSTGRES_URL_NON_POOLING: Optional[str] = None
+    POSTGRES_URL: Optional[str] = os.getenv("POSTGRES_URL")
+    POSTGRES_PRISMA_URL: Optional[str] = os.getenv("POSTGRES_PRISMA_URL")
+    POSTGRES_URL_NON_POOLING: Optional[str] = os.getenv("POSTGRES_URL_NON_POOLING")
     
     # Allow overriding DATABASE_URL directly
-    DATABASE_URL_ENV: Optional[str] = None 
+    DATABASE_URL_ENV: Optional[str] = os.getenv("DATABASE_URL")
     
     @property
     def DATABASE_URL(self) -> str:

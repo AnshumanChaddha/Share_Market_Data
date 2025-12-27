@@ -54,3 +54,12 @@ async def health_check(db: AsyncSession = Depends(get_db)):
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database connection failed: {str(e)}")
+
+@router.get("/debug-env")
+async def debug_env():
+    import os
+    # Return ONLY keys for security to confirm what variables exist
+    return {
+        "env_keys": sorted(list(os.environ.keys())),
+        "postgres_vars_present": [k for k in os.environ.keys() if "POSTGRES" in k or "DATABASE" in k]
+    }
