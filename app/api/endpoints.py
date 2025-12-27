@@ -48,12 +48,17 @@ async def get_stock_history(symbol: str, db: AsyncSession = Depends(get_db)):
 
 @router.get("/health")
 async def health_check(db: AsyncSession = Depends(get_db)):
+    from app.core.config import settings
+    # Mask password for security
+    db_url = settings.DATABASE_URL
+    safe_url = db_url.split("@")[-1] if "@" in db_url else "localhost"
+    
     try:
         from sqlalchemy import text
         await db.execute(text("SELECT 1"))
-        return {"status": "healthy", "database": "connected"}
+        return {"status": "healthy", "database": "connected", "connection_target": safe_url}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database connection failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Database connection failed. Target: {safe_url}. Error: {str(e)}")
 
 @router.get("/debug-env")
 async def debug_env():

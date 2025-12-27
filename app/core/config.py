@@ -22,12 +22,12 @@ class Settings(BaseSettings):
     
     @property
     def DATABASE_URL(self) -> str:
-        # Prioritize Vercel/System Env Vars
+        # Direct fetch to bypass any Pydantic shadowing/default issues
         url = (
-            self.DATABASE_URL_ENV or 
-            self.POSTGRES_URL or 
-            self.POSTGRES_PRISMA_URL or 
-            self.POSTGRES_URL_NON_POOLING
+            os.environ.get("DATABASE_URL") or 
+            os.environ.get("POSTGRES_URL") or 
+            os.environ.get("POSTGRES_PRISMA_URL") or 
+            os.environ.get("POSTGRES_URL_NON_POOLING")
         )
         
         if not url:
